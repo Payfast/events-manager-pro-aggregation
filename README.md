@@ -1,14 +1,14 @@
-# mod-events-manager-pro
+# events-manager-pro-aggregation
 
-## Payfast module v1.1.0 for Events Manager v6.6.4.4 and Events Manager Pro v3.5
+## Payfast aggregation module v1.2.0 for Events Manager v7.1.0.0 and Events Manager Pro v3.6.2
 
-This is the Payfast module for Events Manager Pro. Please feel free
+This is the Payfast aggregation module for Events Manager Pro. Please feel free
 to [contact the Payfast support team](https://payfast.io/contact/) should you require any assistance.
 
 ## Installation
 
 1. Verify that WordPress has the **Events Manager** and **Events Manager Pro** plugins installed and activated.
-2. Download and unzip [v1.1.0](https://github.com/Payfast/mod-events-manager-pro/archive/refs/tags/v1.1.0.zip).
+2. Download and unzip [v1.2.0](https://github.com/Payfast/events-manager-pro-aggregation/archive/refs/tags/v1.2.0.zip).
 3. Using FTP to copy the wp-content file to your root WordPress directory.
 4. Add ```include('gateway.payfast.php');``` to **line ±88** of:
 
@@ -52,7 +52,8 @@ function em_get_currencies(){
 6. Log in to the admin dashboard of your website, then navigate to **Events** -> **Payment Gateways**.
 7. Click on **Payfast** -> **settings**, then set the **General Options** and **Payfast Options** according to your
    needs.
-8. Under **Payfast Options** set the **Return URL** to  http://yoursite.com/youreventspage/my-bookings/?thanks=1 needs and **Cancel URL** to http://yoursite.com/events/.
+8. Under **Payfast Options** set the **Return URL** to  http://yoursite.com/youreventspage/my-bookings/?thanks=1 needs
+   and **Cancel URL** to http://yoursite.com/events/.
 9. Click the **Save Changes** button.
 10. Navigate back to **Events** -> **Payment Gateways**, then click **Payfast** -> **Activate**.
 11. Navigate to **Settings** -> **Bookings** -> **Pricing Options** and select **ZAR - South African Rand** from the

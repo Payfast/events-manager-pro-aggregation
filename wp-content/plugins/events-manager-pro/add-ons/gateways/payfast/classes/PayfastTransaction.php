@@ -67,6 +67,7 @@ class PayfastTransaction
 
     /**
      * @param PaymentRequest $paymentRequest
+     *
      * @return void
      */
     public static function process_itn_response(PaymentRequest $paymentRequest)
@@ -80,13 +81,13 @@ class PayfastTransaction
         $pfParamString = '';
         $moduleInfo    = [
             'pfSoftwareName'       => 'Events Manager',
-            'pfSoftwareVer'        => '3.5',
+            'pfSoftwareVer'        => '3.6.2',
             'pfSoftwareModuleName' => 'PayFast-Events Manager',
-            'pfModuleVer'          => '1.1.0',
+            'pfModuleVer'          => '1.2.0',
         ];
         $pfHost        = (get_option(
-                'em_' . Gateway::$gateway . STATUS
-            ) == 'test') ? 'sandbox.payfast.co.za' : 'www.payfast.co.za';
+                              'em_' . Gateway::$gateway . STATUS
+                          ) == 'test') ? 'sandbox.payfast.co.za' : 'www.payfast.co.za';
 
         //// Notify Payfast that information has been received
         Gateway::notifyPF($pfError, $pfDone);
@@ -130,8 +131,8 @@ class PayfastTransaction
             $new_status = false;
 
             // Sanitize and validate inputs
-            $amount_raw = isset( $_POST['amount_gross'] )
-                ? filter_var( $_POST['amount_gross'], FILTER_SANITIZE_NUMBER_FLOAT, FILTER_FLAG_ALLOW_FRACTION )
+            $amount_raw     = isset($_POST['amount_gross'])
+                ? filter_var($_POST['amount_gross'], FILTER_SANITIZE_NUMBER_FLOAT, FILTER_FLAG_ALLOW_FRACTION)
                 : null;
             $booking_id_raw = isset($_POST['m_payment_id']) ? sanitize_text_field($_POST['m_payment_id']) : null;
             // Common variables
@@ -178,8 +179,8 @@ class PayfastTransaction
             $pf_merchant_key = get_option('em_' . Gateway::$gateway . MERCHANT_KEY);
             $passPhrase      = get_option('em_' . Gateway::$gateway . PASSPHRASE);
             $pfPassphrase    = (empty($passPhrase) ||
-                empty($pf_merchant_id) ||
-                empty($pf_merchant_key))
+                                empty($pf_merchant_id) ||
+                                empty($pf_merchant_key))
                 ? null : $passPhrase;
 
             // If signature different, log for debugging
@@ -199,7 +200,7 @@ class PayfastTransaction
         $paymentRequest->pflog('-Complete');
 
         $pfPaymentId   = isset($_POST['pf_payment_id']) ? sanitize_text_field($_POST['pf_payment_id']) : '';
-        $paymentStatus  = isset($_POST['payment_status']) ? sanitize_text_field($_POST['payment_status']) : '';
+        $paymentStatus = isset($_POST['payment_status']) ? sanitize_text_field($_POST['payment_status']) : '';
 
         // Case: successful payment
         Gateway::record_transaction(
@@ -211,8 +212,12 @@ class PayfastTransaction
             $paymentStatus,
             ''
         );
-        if ( isset( $_POST['amount_gross'] ) ) {
-            $amount_gross = filter_var( $_POST['amount_gross'], FILTER_SANITIZE_NUMBER_FLOAT, FILTER_FLAG_ALLOW_FRACTION );
+        if (isset($_POST['amount_gross'])) {
+            $amount_gross = filter_var(
+                $_POST['amount_gross'],
+                FILTER_SANITIZE_NUMBER_FLOAT,
+                FILTER_FLAG_ALLOW_FRACTION
+            );
 
             if ($amount_gross >= $EM_Booking->get_price() && (!get_option(
                         'em_' . Gateway::$gateway . MANUAL_APPROVAL,
@@ -233,9 +238,9 @@ class PayfastTransaction
 
         $paymentRequest->pflog('- Failed');
         // Case: denied
-        $note = 'Last transaction failed';
+        $note          = 'Last transaction failed';
         $pfPaymentId   = isset($_POST['pf_payment_id']) ? sanitize_text_field($_POST['pf_payment_id']) : '';
-        $paymentStatus  = isset($_POST['payment_status']) ? sanitize_text_field($_POST['payment_status']) : '';
+        $paymentStatus = isset($_POST['payment_status']) ? sanitize_text_field($_POST['payment_status']) : '';
         Gateway::record_transaction(
             $EM_Booking,
             $amount,
@@ -255,9 +260,9 @@ class PayfastTransaction
 
         $paymentRequest->pflog('- Pending');
         // Case: pending
-        $note = 'Last transaction is pending. Reason: ';
-        $txnId   = isset($_POST['txn_id']) ? sanitize_text_field($_POST['txn_id']) : '';
-        $paymentStatus  = isset($_POST['payment_status']) ? sanitize_text_field($_POST['payment_status']) : '';
+        $note          = 'Last transaction is pending. Reason: ';
+        $txnId         = isset($_POST['txn_id']) ? sanitize_text_field($_POST['txn_id']) : '';
+        $paymentStatus = isset($_POST['payment_status']) ? sanitize_text_field($_POST['payment_status']) : '';
         Gateway::record_transaction(
             $EM_Booking,
             $amount,

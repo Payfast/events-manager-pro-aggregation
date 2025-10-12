@@ -17,9 +17,9 @@ require_once __DIR__ . '/vendor/autoload.php';
 
 // Global constants
 define('PF_SOFTWARE_NAME', 'Events Manager');
-define('PF_MODULE_NAME', 'PayFast-Events Manager');
-define('PF_MODULE_VER', '1.1.0');
-define('PF_SOFTWARE_VER', '3.5');
+define('PF_MODULE_NAME', 'PayFast Aggregation-Events Manager');
+define('PF_MODULE_VER', '1.2.0');
+define('PF_SOFTWARE_VER', '3.6.2');
 define('PF_DEBUG', get_option("em_payfast_debug") == 'true' ? true : false);
 
 define('BOOKING_TIMEOUT', '_booking_timeout');
@@ -44,14 +44,14 @@ define('BOOKING_FEEDBACK', '_booking_feedback');
 class Gateway extends \EM\Payments\Gateway
 {
 
-    public static $gateway                    = 'payfast';
-    public static $title                      = 'Payfast';
-    public static $status                     = 4;
-    public static $button_enabled             = true;
-    public static $count_pending_spaces       = true;
-    public static $can_manually_approve       = false;
+    public static $gateway = 'payfast';
+    public static $title = 'Payfast Aggregation';
+    public static $status = 4;
+    public static $button_enabled = true;
+    public static $count_pending_spaces = true;
+    public static $can_manually_approve = false;
     public static $supports_multiple_bookings = true;
-    public static $status_txt                 = 'Awaiting Payfast Payment';
+    public static $status_txt = 'Awaiting Payfast Aggregation Payment';
 
     /**
      * Sets up gateway and registers actions/filters
@@ -101,7 +101,7 @@ class Gateway extends \EM\Payments\Gateway
         // Double check $EM_Booking is an EM_Booking object and that we have a booking awaiting payment.
         if (is_object($EM_Booking) && static::uses_gateway($EM_Booking)) {
             if (!empty($return['result']) && $EM_Booking->get_price(
-                ) > 0 && $EM_Booking->booking_status == static::$status) {
+                    ) > 0 && $EM_Booking->booking_status == static::$status) {
                 $return['message'] = get_option('em_payfast_booking_feedback');
                 $payfast_url       = static::get_payfast_url();
                 $payfast_vars      = static::get_payfast_vars($EM_Booking);
@@ -129,9 +129,9 @@ class Gateway extends \EM\Payments\Gateway
         global $EM_Booking;
         if (is_object($EM_Booking)) {
             $feedback .= "<br />" . __(
-                    'To finalize your booking, please click the following button to proceed to Payfast.',
-                    'em-pro'
-                ) . static::em_my_bookings_booking_actions('', $EM_Booking);
+                            'To finalize your booking, please click the following button to proceed to Payfast.',
+                            'em-pro'
+                    ) . static::em_my_bookings_booking_actions('', $EM_Booking);
         }
 
         return $feedback;
@@ -149,7 +149,7 @@ class Gateway extends \EM\Payments\Gateway
     {
         parent::booking_add($EM_Event, $EM_Booking, $post_validation);
         if (!defined(
-            'DOING_AJAX'
+                'DOING_AJAX'
         )) { //we aren't doing ajax here, so we should provide a way to edit the $EM_Notices ojbect.
             add_action('option_dbem_booking_feedback', array(static::class, 'booking_form_feedback_fallback'));
         }
@@ -170,10 +170,10 @@ class Gateway extends \EM\Payments\Gateway
         if (static::uses_gateway($EM_Booking) && $EM_Booking->booking_status == static::$status) {
             // First make sure there's no pending payments
             $pending_payments = $wpdb->get_var(
-                'SELECT COUNT(*) FROM '
-                . EM_TRANSACTIONS_TABLE
-                . " WHERE booking_id='{$EM_Booking->booking_id}' AND transaction_gateway='"
-                . static::$gateway . "' AND transaction_status='Pending'"
+                    'SELECT COUNT(*) FROM '
+                    . EM_TRANSACTIONS_TABLE
+                    . " WHERE booking_id='{$EM_Booking->booking_id}' AND transaction_gateway='"
+                    . static::$gateway . "' AND transaction_status='Pending'"
             );
             if ($pending_payments == 0) {
                 //user owes money!
@@ -207,18 +207,18 @@ class Gateway extends \EM\Payments\Gateway
     public static function bookings_table_actions($actions, $EM_Booking)
     {
         return array(
-            'approve' => '<a class="em-bookings-approve em-bookings-approve-offline" href="' . em_add_get_params(
-                    $_SERVER['REQUEST_URI'],
-                    array('action' => 'bookings_approve', 'booking_id' => $EM_Booking->booking_id)
-                ) . '">' . esc_html__emp('Approve', 'dbem') . '</a>',
-            'delete'  => '<span class="trash"><a class="em-bookings-delete" href="' . em_add_get_params(
-                    $_SERVER['REQUEST_URI'],
-                    array('action' => 'bookings_delete', 'booking_id' => $EM_Booking->booking_id)
-                ) . '">' . esc_html__emp('Delete', 'dbem') . '</a></span>',
-            'edit'    => '<a class="em-bookings-edit" href="' . em_add_get_params(
-                    $EM_Booking->get_event()->get_bookings_url(),
-                    array('booking_id' => $EM_Booking->booking_id, 'em_ajax' => null, 'em_obj' => null)
-                ) . '">' . esc_html__emp('Edit/View', 'dbem') . '</a>',
+                'approve' => '<a class="em-bookings-approve em-bookings-approve-offline" href="' . em_add_get_params(
+                                $_SERVER['REQUEST_URI'],
+                                array('action' => 'bookings_approve', 'booking_id' => $EM_Booking->booking_id)
+                        ) . '">' . esc_html__emp('Approve', 'dbem') . '</a>',
+                'delete'  => '<span class="trash"><a class="em-bookings-delete" href="' . em_add_get_params(
+                                $_SERVER['REQUEST_URI'],
+                                array('action' => 'bookings_delete', 'booking_id' => $EM_Booking->booking_id)
+                        ) . '">' . esc_html__emp('Delete', 'dbem') . '</a></span>',
+                'edit'    => '<a class="em-bookings-edit" href="' . em_add_get_params(
+                                $EM_Booking->get_event()->get_bookings_url(),
+                                array('booking_id' => $EM_Booking->booking_id, 'em_ajax' => null, 'em_obj' => null)
+                        ) . '">' . esc_html__emp('Edit/View', 'dbem') . '</a>',
         );
     }
 
@@ -232,16 +232,16 @@ class Gateway extends \EM\Payments\Gateway
     public static function get_payfast_url()
     {
         return (get_option(
-                'em_' . static::$gateway . STATUS
-            ) == 'test') ? 'https://sandbox.payfast.co.za/eng/process' : 'https://www.payfast.co.za/eng/process';
+                        'em_' . static::$gateway . STATUS
+                ) == 'test') ? 'https://sandbox.payfast.co.za/eng/process' : 'https://www.payfast.co.za/eng/process';
     }
 
     public static function say_thanks()
     {
         if (!empty($_REQUEST['thanks'])) {
             echo "<div class='em-booking-message em-booking-message-success'>" . get_option(
-                    'em_' . static::$gateway . BOOKING_FEEDBACK_THANKS
-                ) . '</div>';
+                            'em_' . static::$gateway . BOOKING_FEEDBACK_THANKS
+                    ) . '</div>';
         }
     }
 
@@ -276,7 +276,7 @@ class Gateway extends \EM\Payments\Gateway
         <div id="em-gateway-payment" class="stuffbox">
             <h3>
                 <?php
-                _e('Add Payfast Payment', 'em-pro'); ?>
+                _e('Add Payfast Aggregation Payment', 'em-pro'); ?>
             </h3>
             <div class="inside">
                 <div>
@@ -293,9 +293,9 @@ class Gateway extends \EM\Payments\Gateway
                                     <br/>
                                     <em><?php
                                         _e(
-                                            'Please enter a valid payment amount (e.g. 10.00). '
-                                            . 'Use negative numbers to credit a booking.',
-                                            'em-pro'
+                                                'Please enter a valid payment amount (e.g. 10.00). '
+                                                . 'Use negative numbers to credit a booking.',
+                                                'em-pro'
                                         ); ?></em>
                                 </td>
                             </tr>
@@ -315,13 +315,13 @@ class Gateway extends \EM\Payments\Gateway
                         <input type="hidden" name="_wpnonce" value="<?php
                         echo wp_create_nonce('gateway_add_payment'); ?>"/>
                         <input type="hidden" name="redirect_to" value="<?php
-                            if ( ! empty( $_REQUEST['redirect_to'] ) ) {
-                                $redirect_to = esc_url_raw( $_REQUEST['redirect_to'], array( 'http', 'https' ) );
-                                echo esc_attr( $redirect_to );
-                            } else {
-                                $referer = em_wp_get_referer();
-                                echo esc_attr( esc_url( $referer ) );
-                            }
+                        if (!empty($_REQUEST['redirect_to'])) {
+                            $redirect_to = esc_url_raw($_REQUEST['redirect_to'], array('http', 'https'));
+                            echo esc_attr($redirect_to);
+                        } else {
+                            $referer = em_wp_get_referer();
+                            echo esc_attr(esc_url($referer));
+                        }
                         ?>"/>
                         <input type="submit" class="<?php
                         if (is_admin()) {
@@ -353,8 +353,8 @@ class Gateway extends \EM\Payments\Gateway
         //for all intents and purposes,
         // if there's no gateway assigned but this booking status matches, we assume it's offline
         return parent::uses_gateway(
-                $EM_Booking
-            ) || (empty($EM_Booking->booking_meta['gateway']) && $EM_Booking->booking_status == static::$status);
+                        $EM_Booking
+                ) || (empty($EM_Booking->booking_meta['gateway']) && $EM_Booking->booking_status == static::$status);
     }
 
     /**
