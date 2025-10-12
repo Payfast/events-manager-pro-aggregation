@@ -1,6 +1,6 @@
 # events-manager-pro-aggregation
 
-## Payfast aggregation module v1.2.0 for Events Manager v7.1.0.0 and Events Manager Pro v3.6.2
+## Payfast Aggregation module v1.2.0 for Events Manager v7.1.0.0 and Events Manager Pro v3.6.2
 
 This is the Payfast aggregation module for Events Manager Pro. Please feel free
 to [contact the Payfast support team](https://payfast.io/contact/) should you require any assistance.
