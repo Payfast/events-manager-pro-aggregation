@@ -25,7 +25,7 @@ Be careful to not edit **gateway.php**, as there are two similarly named files. 
 /wp-content/plugins/events-manager/em-functions.php
 ```
 
-Search for ** function em_get_currencies()** and replace the function body (i.e. code block within curly braces {}) from
+Search for **function em_get_currencies()** and replace the function body (i.e. code block within curly braces {}) from
 
 ```
 function em_get_currencies(){
