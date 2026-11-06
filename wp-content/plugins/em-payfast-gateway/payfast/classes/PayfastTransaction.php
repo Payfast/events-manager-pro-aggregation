@@ -82,6 +82,17 @@ class PayfastTransaction
     {
         $paymentRequest->pflog('Payfast ITN call received');
 
+        // Validate and sanitize POST data early
+        $payment_status = filter_input(INPUT_POST, 'payment_status', FILTER_SANITIZE_SPECIAL_CHARS);
+        $pf_payment_id = filter_input(INPUT_POST, 'pf_payment_id', FILTER_SANITIZE_SPECIAL_CHARS);
+        $m_payment_id = filter_input(INPUT_POST, 'm_payment_id', FILTER_SANITIZE_SPECIAL_CHARS);
+        $amount_gross = filter_input(INPUT_POST, 'amount_gross', FILTER_SANITIZE_NUMBER_FLOAT, FILTER_FLAG_ALLOW_FRACTION);
+
+        if (empty($payment_status)) {
+            $paymentRequest->pflog('Missing payment_status in POST data');
+            return;
+        }
+
         $pfError       = false;
         $pfErrMsg      = '';
         $pfDone        = false;
@@ -89,13 +100,13 @@ class PayfastTransaction
         $pfParamString = '';
         $moduleInfo    = [
             'pfSoftwareName'       => 'Events Manager',
-            'pfSoftwareVer'        => '3.6.2',
-            'pfSoftwareModuleName' => 'PayFast-Events Manager',
-            'pfModuleVer'          => '1.2.1',
+            'pfSoftwareVer'        => '3.9.4',
+            'pfSoftwareModuleName' => 'Payfast-Events Manager',
+            'pfModuleVer'          => '1.3.0',
         ];
         $pfHost        = (get_option(
                               'em_' . Gateway::$gateway . STATUS
-                          ) == 'test') ? 'sandbox.payfast.co.za' : 'www.payfast.co.za';
+                          ) === 'test') ? 'sandbox.payfast.co.za' : 'www.payfast.co.za';
 
         //// Notify Payfast that information has been received
         Gateway::notifyPF($pfError, $pfDone);
@@ -138,17 +149,12 @@ class PayfastTransaction
 
             $new_status = false;
 
-            // Sanitize and validate inputs
-            $amount_raw     = isset($_POST['amount_gross'])
-                ? filter_var($_POST['amount_gross'], FILTER_SANITIZE_NUMBER_FLOAT, FILTER_FLAG_ALLOW_FRACTION)
-                : null;
-            $booking_id_raw = isset($_POST['m_payment_id']) ? sanitize_text_field($_POST['m_payment_id']) : null;
-            // Common variables
-            $amount     = is_numeric($amount_raw) ? floatval($amount_raw) : 0.00;
+            // Use pre-sanitized values
+            $amount     = is_numeric($amount_gross) ? floatval($amount_gross) : 0.00;
             $currency   = 'ZAR';
             $timestamp  = date('Y-m-d H:i:s');
-            $booking_id = $booking_id_raw;
-            $EM_Booking = $EM_Booking = em_get_booking($booking_id);
+            $booking_id = $m_payment_id;
+            $EM_Booking = em_get_booking($booking_id);
             if (!$EM_Booking || empty($EM_Booking->booking_id)) {
                 $paymentRequest->pflog('Booking not found for m_payment_id=' . print_r($booking_id, true));
                 return;
@@ -160,7 +166,7 @@ class PayfastTransaction
         }
 
         // Process Payfast response
-        match (sanitize_text_field($_POST['payment_status'])) {
+        match ($payment_status) {
             'COMPLETE'  => self::paymentComplete($EM_Booking, $amount, $currency, $timestamp),
             'FAILED'    => self::paymentFailed($EM_Booking, $amount, $currency, $timestamp),
             'CANCELLED' => self::paymentCancelled($EM_Booking, $amount, $currency, $timestamp),
@@ -236,7 +242,8 @@ class PayfastTransaction
                 // Approve and ignore spaces
                 $EM_Booking->approve(true, true);
             } else {
-                $EM_Booking->set_status(0); //Set back to normal "pending"
+                // Set back to normal "pending"
+                $EM_Booking->set_status(Gateway::STATUS_PENDING);
             }
         }
         do_action('em_payment_processed', $EM_Booking, Gateway::class);
@@ -263,7 +270,7 @@ class PayfastTransaction
 
         // Force a real EM status so spaces are released
         $EM_Booking->manage_override = true;
-        $EM_Booking->set_status(2, false); // Rejected (or use 3 if you prefer)
+        $EM_Booking->set_status(Gateway::STATUS_REJECTED, false);
         do_action('em_payment_denied', $EM_Booking, Gateway::class);
     }
 
@@ -288,7 +295,7 @@ class PayfastTransaction
 
         // Force a real EM status so spaces are released
         $EM_Booking->manage_override = true;
-        $EM_Booking->set_status(3, false); // Cancelled
+        $EM_Booking->set_status(Gateway::STATUS_CANCELLED, false);
         do_action('em_payment_denied', $EM_Booking, Gateway::class);
     }
 
