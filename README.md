@@ -2,23 +2,24 @@
 
 ## Payfast Aggregation module v1.3.0 for Events Manager Pro v3.2.x
 
-A standalone WordPress plugin that adds the Payfast payment gateway to Events Manager Pro.
+This is the Payfast Aggregation module for Events Manager Pro. Please feel free
+to [contact the Payfast support team](https://payfast.io/contact/) should you require any assistance.
 
 ## Installation
 
-1. Download the plugin ZIP (`em-payfast-gateway.zip`).
-2. In your WordPress admin go to **Plugins → Add New → Upload Plugin**.
+1. Download the plugin ZIP **[em-payfast-gateway.zip](https://github.com/Payfast/events-manager-pro-aggregation/releases/download/v1.3.0/em-payfast-gateway.zip)**.
+2. In your WordPress admin go to **Plugins** -> **Add New** -> **Upload Plugin**.
 3. Choose the ZIP file and click **Install Now**.
 4. Click **Activate Plugin**.
 
 ## Configuration
 
-1. Go to **Events → Payment Gateways**, find **Payfast Aggregation** and click **Activate**.
+1. Go to **Events** -> **Payment Gateways**, find **Payfast Aggregation** and click **Activate**.
 2. Click **Settings** and fill in your Merchant ID, Merchant Key, Passphrase, Return URL and Cancel URL.
 3. Set **Mode** to *Live* for production or *Test Mode (Sandbox)* for testing.
-4. Go to **Events → Settings → Bookings → Pricing Options** and select **ZAR - South African Rand** as the currency (added automatically by this plugin — no file editing required).
+4. Go to **Events** -> **Settings** -> **Bookings** -> **Pricing Options** and select **ZAR - South African Rand** as the currency.
 
-Please [click here](https://payfast.io/integration/plugins/events-manager-pro/) more information concerning this module.
+Please [click here](https://payfast.io/integration/plugins/events-manager-pro/) for more information concerning this module.
 
 ## Upgrading from the manual installation (v1.2.1 and earlier)
 
