@@ -11,3 +11,4 @@ $(document).bind('em_booking_gateway_add_payfast', function (event, response){
     ppForm.appendTo('body').trigger('submit');
   }
 });
+
